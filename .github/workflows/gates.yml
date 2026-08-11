@@ -1,0 +1,64 @@
+# The gate of record.
+#
+# This is what decides whether a pull request may merge. The build agent can
+# write the pull request body, so a gate report in the body is not evidence —
+# it is a claim by the process being graded. The conclusion of this check run
+# is written by GitHub, and the reviewer reads that instead.
+#
+# The job name must stay `gates`: the reviewer looks up the check run by name
+# and fails closed when it cannot find it.
+#
+# It runs the same code the build loop ran locally, vendored into tools/gates
+# at scaffold time, so the two can never drift into disagreeing.
+
+name: gates
+
+on:
+  push:
+    branches:
+      - "main"
+      - "powerplant/**"
+  pull_request:
+    branches: ["main"]
+
+# A newer push to the same branch makes the older run irrelevant.
+concurrency:
+  group: gates-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: gates
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the toolchain
+        run: |
+          brew install xcodegen
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet pillow numpy
+
+      - name: Generate the Xcode project
+        # Derived from project.yml, never hand-edited — and regenerated here so
+        # a committed .xcodeproj could not change what actually gets built.
+        run: xcodegen generate
+
+      - name: Run the deterministic gate suite
+        env:
+          PYTHONPATH: tools/gates
+        run: python -m powerplant.verify . --json
+
+      - name: Upload the launch screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: launch-screenshot
+          path: .build/launch.png
+          if-no-files-found: ignore

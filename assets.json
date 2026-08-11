@@ -1,0 +1,67 @@
+[
+  {
+    "id": "appicon",
+    "path": "App/Assets.xcassets/AppIcon.appiconset",
+    "generator": "appicon",
+    "source": "art/icon.svg",
+    "sizes": [1024, 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29, 20],
+    "no_alpha": true,
+    "non_blank": true,
+    "purpose": "Home screen and Settings icon, light appearance. A white receipt card with a torn bottom edge, tilted 8 degrees, on a diagonal gradient from deep teal #0A3D3A to green #067A58. A bold amber #E08A18 percent sign sits on the card, its slash doubling as the receipt fold line. Flat, no bevel, no text. Opaque to the edges - no rounded corner mask, iOS applies it."
+  },
+  {
+    "id": "appicon-dark",
+    "path": "App/Assets.xcassets/AppIcon.appiconset/icon-dark-1024.png",
+    "generator": "svg",
+    "source": "art/icon-dark.svg",
+    "width": 1024,
+    "height": 1024,
+    "non_blank": true,
+    "purpose": "iOS 18+ dark appearance icon variant. Same mark, but the receipt card is #18221F with a #35D6A4 outline, the percent sign is #F5B14A, and the gradient background is dropped to transparent so the system dark plate shows through."
+  },
+  {
+    "id": "appicon-tinted",
+    "path": "App/Assets.xcassets/AppIcon.appiconset/icon-tinted-1024.png",
+    "generator": "svg",
+    "source": "art/icon-tinted.svg",
+    "width": 1024,
+    "height": 1024,
+    "non_blank": true,
+    "purpose": "iOS 18+ tinted appearance icon variant. The same mark rendered in greyscale only, on transparent: card at 92% white, percent sign at 55% white, fold line at 30% white. No colour anywhere - iOS supplies the tint."
+  },
+  {
+    "id": "palette",
+    "path": "App/Sources/DesignSystem/Palette.swift",
+    "generator": "swift",
+    "source": "App/Sources/DesignSystem/Palette.swift",
+    "purpose": "Every colour in ART.md as a Color that resolves per appearance, plus the accent colour used by selected tip presets, the save button and the grand total. Replaces an asset-catalog colour set so light and dark values live next to the code that uses them and can be unit-tested."
+  },
+  {
+    "id": "typography",
+    "path": "App/Sources/DesignSystem/Typography.swift",
+    "generator": "swift",
+    "source": "App/Sources/DesignSystem/Typography.swift",
+    "purpose": "The six type roles from ART.md as Font values on SF Rounded and SF Pro Text, each scaling from its matching Dynamic Type text style, with monospaced digits on every numeric role."
+  },
+  {
+    "id": "keystyle",
+    "path": "App/Sources/DesignSystem/KeyButtonStyle.swift",
+    "generator": "swift",
+    "source": "App/Sources/DesignSystem/KeyButtonStyle.swift",
+    "purpose": "The keypad key background - a 16 pt continuous rounded rectangle in Surface that fills with Surface raised and scales to 0.96 while pressed. Deliberately code, not a PNG, so it adapts to appearance and animates."
+  },
+  {
+    "id": "receiptedge",
+    "path": "App/Sources/DesignSystem/ReceiptEdge.swift",
+    "generator": "swift",
+    "source": "App/Sources/DesignSystem/ReceiptEdge.swift",
+    "purpose": "The torn receipt edge along the bottom of the totals card - a SwiftUI Shape of repeating triangular notches 10 pt wide and 6 pt deep, so it recolours and resizes with the card."
+  },
+  {
+    "id": "launchcolor",
+    "path": "App/Assets.xcassets/LaunchBackground.colorset/Contents.json",
+    "generator": "swift",
+    "source": "App/Assets.xcassets/LaunchBackground.colorset/Contents.json",
+    "purpose": "The launch screen background colour set, referenced by UILaunchScreen in Info.plist. Light #F2F5F3, dark #0B1311 - the same values as Background, so launch is an invisible hold rather than a flash. No logo, no image."
+  }
+]

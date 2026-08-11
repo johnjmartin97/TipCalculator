@@ -1,0 +1,8 @@
+{
+  "bundle_id": "com.powerplant.tipcalculator",
+  "project_name": "TipCalculator",
+  "scheme": "TipCalculator",
+  "test_target": "TipCalculatorTests",
+  "uitest_target": "TipCalculatorUITests",
+  "work_type": "ios"
+}
