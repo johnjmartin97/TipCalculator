@@ -8,9 +8,6 @@ enum RoundMode {
 }
 
 /// The calculation engine. All money is whole cents (`Int`), never `Double`.
-///
-/// Declarations only — no behaviour yet. TIP-1's failing test needs these
-/// symbols to exist so it fails on wrong values instead of on a missing type.
 final class TipCalculator {
 
     // Inputs
@@ -20,17 +17,35 @@ final class TipCalculator {
     var roundMode: RoundMode = .off
 
     // Outputs
-    var tipTotal: Int { 0 }
-    var grandTotal: Int { 0 }
-    var perPerson: Int { 0 }
-    var perPersonTip: Int { 0 }
+
+    /// What the grand total rounds to, before the tip is worked back out.
+    /// Rounding moves the total, and the tip absorbs the difference.
+    var grandTotal: Int {
+        let unrounded = bill + TipCalculator.roundHalfUp(bill: bill, percent: tipPercent)
+        switch roundMode {
+        case .off:
+            return unrounded
+        case .up:
+            return (unrounded + 99) / 100 * 100
+        case .down:
+            // Rounding down must never take the tip below zero.
+            return max(unrounded / 100 * 100, bill)
+        }
+    }
+
+    var tipTotal: Int { grandTotal - bill }
+
+    var perPerson: Int { grandTotal / splitCount }
+    var perPersonTip: Int { tipTotal / splitCount }
 
     /// How many people pay one cent more than `perPerson`.
-    var remainderCount: Int { 0 }
+    var remainderCount: Int { grandTotal % splitCount }
 
     /// How many people pay one cent more than `perPersonTip`.
-    var tipRemainderCount: Int { 0 }
+    var tipRemainderCount: Int { tipTotal % splitCount }
 
     /// `percent` of `bill` cents, rounded half up on the final cent.
-    static func roundHalfUp(bill: Int, percent: Int) -> Int { 0 }
+    static func roundHalfUp(bill: Int, percent: Int) -> Int {
+        (bill * percent + 50) / 100
+    }
 }
