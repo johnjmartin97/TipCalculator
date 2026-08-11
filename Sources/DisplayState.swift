@@ -13,7 +13,7 @@ struct DisplayState {
     init(model: TipCalculator, locale: Locale) {
         let money = CurrencyFormatter(locale: locale)
 
-        billText = money.formatted(cents: model.bill)
+        billText = money.formatted(cents: model.billCents)
         tipText = money.formatted(cents: model.tipTotal)
         totalText = money.formatted(cents: model.grandTotal)
         perPersonText = money.formatted(cents: model.perPerson)

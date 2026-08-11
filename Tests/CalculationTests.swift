@@ -33,7 +33,7 @@ final class CalculationTests: XCTestCase {
 
     func testPublicSurfaceExposesNoDoubleOrFloat() {
         let model = TipCalculator()
-        model.bill = 4999
+        model.billCents = 4999
         model.tipPercent = 18
         model.splitCount = 3
         model.roundMode = .up
@@ -47,7 +47,7 @@ final class CalculationTests: XCTestCase {
             XCTAssertFalse(typeName.contains("Float"), "stored property \(label) has type \(typeName)")
         }
 
-        XCTAssertTrue(type(of: model.bill) == Int.self, "bill is not Int")
+        XCTAssertTrue(type(of: model.billCents) == Int.self, "billCents is not Int")
         XCTAssertTrue(type(of: model.tipTotal) == Int.self, "tipTotal is not Int")
         XCTAssertTrue(type(of: model.grandTotal) == Int.self, "grandTotal is not Int")
         XCTAssertTrue(type(of: model.perPerson) == Int.self, "perPerson is not Int")
@@ -93,7 +93,7 @@ final class CalculationTests: XCTestCase {
         outer: for mode in modes {
             model.roundMode = mode
             for bill in bills {
-                model.bill = bill
+                model.billCents = bill
                 for percent in percents {
                     model.tipPercent = percent
                     let grand = model.grandTotal
@@ -119,7 +119,7 @@ final class CalculationTests: XCTestCase {
         outer: for mode in modes {
             model.roundMode = mode
             for bill in bills {
-                model.bill = bill
+                model.billCents = bill
                 for percent in percents {
                     model.tipPercent = percent
                     let grand = model.grandTotal
@@ -176,7 +176,7 @@ final class CalculationTests: XCTestCase {
         var failure: String?
 
         outer: for bill in bills {
-            model.bill = bill
+            model.billCents = bill
             for percent in percents {
                 model.tipPercent = percent
                 let grand = model.grandTotal
@@ -203,7 +203,7 @@ final class CalculationTests: XCTestCase {
 
     func testRoundUpLeavesAWholeUnitTotalUnchanged() {
         let model = TipCalculator()
-        model.bill = 10000
+        model.billCents = 10000
         model.tipPercent = 0
         model.splitCount = 1
         model.roundMode = .up
@@ -221,7 +221,7 @@ final class CalculationTests: XCTestCase {
         var failure: String?
 
         outer: for bill in bills {
-            model.bill = bill
+            model.billCents = bill
             for percent in percents {
                 model.tipPercent = percent
                 let grand = model.grandTotal
@@ -247,7 +247,7 @@ final class CalculationTests: XCTestCase {
 
     func testRoundDownClampsInsteadOfMakingTheTipNegative() {
         let model = TipCalculator()
-        model.bill = 5000
+        model.billCents = 5000
         model.tipPercent = 0
         model.splitCount = 1
         model.roundMode = .down
@@ -260,7 +260,7 @@ final class CalculationTests: XCTestCase {
 
     func testZeroBillGivesZeroForEveryPercentSplitAndRoundMode() {
         let model = TipCalculator()
-        model.bill = 0
+        model.billCents = 0
         var failure: String?
 
         outer: for mode in modes {
@@ -290,7 +290,7 @@ final class CalculationTests: XCTestCase {
 
     func testThreeCentsAcrossTenPeopleGivesThreePeopleOneCent() {
         let model = TipCalculator()
-        model.bill = 3
+        model.billCents = 3
         model.tipPercent = 0
         model.splitCount = 10
         model.roundMode = .off
@@ -306,7 +306,7 @@ final class CalculationTests: XCTestCase {
 
     func testSplitOfOneGivesTheWholeTotalToThatPerson() {
         let model = TipCalculator()
-        model.bill = 4999
+        model.billCents = 4999
         model.tipPercent = 20
         model.splitCount = 1
         model.roundMode = .off

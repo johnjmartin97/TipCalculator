@@ -61,7 +61,7 @@ final class FormattingTests: XCTestCase {
 
     func testDisplayStateForSingleDinerExposesEveryFormattedAmount() {
         let model = TipCalculator()
-        model.bill = 4999
+        model.billCents = 4999
         model.tipPercent = 20
         model.splitCount = 1
         model.roundMode = .off
@@ -79,7 +79,7 @@ final class FormattingTests: XCTestCase {
 
     func testDisplayStateNamesTheRemainderWhenTheSplitIsUneven() {
         let model = TipCalculator()
-        model.bill = 1000
+        model.billCents = 1000
         model.tipPercent = 0
         model.splitCount = 3
         model.roundMode = .off
@@ -109,7 +109,7 @@ final class FormattingTests: XCTestCase {
     @MainActor
     func testRootViewBuildsFromAModel() {
         let model = TipCalculator()
-        model.bill = 4999
+        model.billCents = 4999
 
         let view = RootView(model: model)
         _ = view.body
