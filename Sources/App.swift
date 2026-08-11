@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct TipCalculatorApp: App {
-    private let model = TipCalculator()
+    @State private var model = TipCalculator()
 
     var body: some Scene {
         WindowGroup {

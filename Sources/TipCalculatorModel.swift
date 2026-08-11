@@ -1,13 +1,16 @@
 import Foundation
+import Observation
 
 /// How the grand total is rounded to a whole currency unit.
-enum RoundMode {
+enum RoundMode: CaseIterable {
     case off
     case up
     case down
 }
 
 /// The calculation engine. All money is whole cents (`Int`), never `Double`.
+/// Observable so the screen redraws the moment an input changes.
+@Observable
 final class TipCalculator {
 
     // Inputs
@@ -17,11 +20,7 @@ final class TipCalculator {
     var roundMode: RoundMode = .off
 
     /// The preset the tip currently comes from, or `nil` when the tip is custom.
-    ///
-    /// Declarations only from here down — no behaviour yet. TIP-3's failing
-    /// test needs these symbols to exist so it fails on wrong behaviour instead
-    /// of on a missing member.
-    var selectedPreset: Int?
+    var selectedPreset: Int? = 20
 
     /// True when the tip was typed rather than picked from a preset.
     var isCustomTip: Bool = false
@@ -32,31 +31,59 @@ final class TipCalculator {
     /// The bill holds at most this many digits.
     static let maximumBillDigits = 9
 
+    /// One past the largest bill, so `$9,999,999.99` is the ceiling.
+    static let billLimit = 1_000_000_000
+
     /// The split may not go below this, nor above `maximumSplitCount`.
     static let minimumSplitCount = 1
     static let maximumSplitCount = 50
 
     // Input actions
 
-    /// Shifts one digit in from the right of the bill.
-    func tapDigit(_ digit: Int) {}
+    /// Shifts one digit in from the right of the bill. Taps past the digit limit
+    /// are ignored; a leading zero never lands, so the bill stays empty.
+    func tapDigit(_ digit: Int) {
+        guard billCents < TipCalculator.billLimit / 10 else { return }
+        billCents = billCents * 10 + digit
+    }
 
     /// Shifts the rightmost digit off the bill.
-    func tapDelete() {}
+    func tapDelete() {
+        billCents /= 10
+    }
 
-    func selectPreset(_ percent: Int) {}
+    /// Picks a preset tip. The custom tip is dropped.
+    func selectPreset(_ percent: Int) {
+        tipPercent = percent
+        selectedPreset = percent
+        isCustomTip = false
+    }
 
-    func setCustomTip(_ percent: Int) {}
+    /// Types a tip percent. Clamps to 0...100 and deselects every preset, even
+    /// when the value happens to equal one.
+    func setCustomTip(_ percent: Int) {
+        tipPercent = min(max(percent, 0), 100)
+        selectedPreset = nil
+        isCustomTip = true
+    }
 
-    func isPresetSelected(_ percent: Int) -> Bool { false }
+    func isPresetSelected(_ percent: Int) -> Bool {
+        selectedPreset == percent
+    }
 
-    func incrementSplit() {}
+    func incrementSplit() {
+        guard canIncrementSplit else { return }
+        splitCount += 1
+    }
 
-    func decrementSplit() {}
+    func decrementSplit() {
+        guard canDecrementSplit else { return }
+        splitCount -= 1
+    }
 
-    var canIncrementSplit: Bool { false }
+    var canIncrementSplit: Bool { splitCount < TipCalculator.maximumSplitCount }
 
-    var canDecrementSplit: Bool { false }
+    var canDecrementSplit: Bool { splitCount > TipCalculator.minimumSplitCount }
 
     // Outputs
 
