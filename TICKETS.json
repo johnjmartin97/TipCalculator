@@ -1,0 +1,130 @@
+[
+  {
+    "identifier": "TIP-1",
+    "title": "Cents-only calculation engine with exhaustive verification",
+    "criteria": [
+      "The model's public surface exposes bill, tip total, grand total, per-person share and per-person tip as Int cents only; a test asserting no public property or method of TipCalculator has a Double or Float type passes via Mirror/type reflection over an instance.",
+      "roundHalfUp(bill: 4999, percent: 15) returns 750, and roundHalfUp(bill: 100, percent: 15) returns 15.",
+      "Exhaustive sweep: for every bill in 0...2000 cents, every tip percent in 0...100, every split count in 1...50 and all three round modes, the model computes without crashing and satisfies all of the invariants below.",
+      "Invariant across the whole sweep: grandTotal == bill + tipTotal.",
+      "Invariant across the whole sweep: base share * n + (number of people paying one extra cent) == grandTotal, i.e. the per-person parts sum exactly to grandTotal with zero cents lost; the same holds for perPersonTip summing to tipTotal.",
+      "Invariant across the whole sweep with round mode up: grandTotal is a multiple of 100 cents, grandTotal >= bill + roundHalfUp(bill*pct/100), and grandTotal - (bill + roundHalfUp(bill*pct/100)) < 100.",
+      "Invariant across the whole sweep with round mode down: grandTotal is a multiple of 100 cents OR grandTotal == bill, and grandTotal >= bill in every case (tipTotal never negative).",
+      "Round mode up on a total already equal to a whole currency unit leaves grandTotal unchanged (bill 10000, tip 0%, mode up gives 10000).",
+      "Round mode down where rounding would make the tip negative clamps: bill 5000, tip 0%, mode down gives grandTotal 5000 and tipTotal 0.",
+      "Bill 0 with any percent, any split and any round mode gives tipTotal 0, grandTotal 0, perPerson 0 and perPersonTip 0.",
+      "Grand total 3 cents split across 10 gives base share 0, remainder count 3, and each of those 3 pays 1 cent.",
+      "Split 1 gives perPerson == grandTotal and remainder count 0."
+    ],
+    "test_file": "Tests/CalculationTests.swift",
+    "status": "pending",
+    "commit": ""
+  },
+  {
+    "identifier": "TIP-2",
+    "title": "Currency formatting and the read-only totals screen",
+    "criteria": [
+      "formatted(cents: 4999) in en_US returns \"$49.99\"; formatted(cents: 0) returns \"$0.00\"; formatted(cents: 999999999) returns \"$9,999,999.99\".",
+      "The same formatter given a de_DE locale returns a string containing \",\" as the decimal separator and \"\u20ac\", proving the symbol and separator come from the passed Locale and not hardcoded.",
+      "The formatter accepts Int cents only \u2014 a test asserting its parameter type is Int passes.",
+      "A DisplayState built from a model with bill 4999, tip 20%, split 1, round off exposes billText \"$49.99\", tipText \"$10.00\", totalText \"$59.99\", perPersonText \"$59.99\" and remainderText nil.",
+      "A DisplayState built from bill 1000, tip 0%, split 3, round off exposes perPersonText \"$3.33\" and a non-nil remainderText containing \"1\" and \"$3.34\".",
+      "Building the root view with a model does not crash and the app launches to the totals screen (the existing launch UI test still passes)."
+    ],
+    "test_file": "Tests/FormattingTests.swift",
+    "status": "pending",
+    "commit": ""
+  },
+  {
+    "identifier": "TIP-3",
+    "title": "Keypad, tip presets, split stepper and round mode input",
+    "criteria": [
+      "Tapping digits 4, 9, 9, 9 on a fresh model gives billCents 4999.",
+      "Tapping 0 on an empty bill leaves billCents 0.",
+      "Delete after entering 4, 9, 9, 9 gives billCents 499; a second delete gives 49.",
+      "Delete on an empty bill leaves billCents 0 and mutates nothing else.",
+      "After entering 9 digits (billCents 999999999) a tenth digit tap leaves billCents unchanged at 999999999.",
+      "A fresh model has tipPercent 20 and selectedPreset 20.",
+      "Selecting preset 15 sets tipPercent 15, marks 15 as the only selected preset, and clears the custom selection flag.",
+      "Setting a custom tip of 22 sets tipPercent 22 and leaves no preset selected; setting a custom value of 20 still leaves no preset selected.",
+      "Custom tip clamps: setting 101 leaves tipPercent at 100; setting -1 leaves it at 0; steps are whole integers.",
+      "splitCount starts at 1; decrement at 1 leaves it at 1 and canDecrementSplit is false; increment 49 times reaches 50, canIncrementSplit is then false and a further increment leaves it at 50.",
+      "roundMode starts at .off; setting .up then .down then .off round-trips and the outputs recompute to the values ticket 1 asserts.",
+      "Every input mutation recomputes outputs synchronously \u2014 reading grandTotal immediately after a digit tap reflects that digit, with no async wait."
+    ],
+    "test_file": "Tests/InputTests.swift",
+    "status": "pending",
+    "commit": ""
+  },
+  {
+    "identifier": "TIP-4",
+    "title": "Visual pass against the art direction",
+    "criteria": [
+      "Palette resolves every one of the 12 named roles to the exact light and dark hex in ART.md (Background #F2F5F3/#0B1311, Surface #FFFFFF/#18221F, Surface raised #E8EDEA/#22302C, Primary #067A58/#35D6A4, Primary on-colour #FFFFFF/#052018, Secondary #0F4C46/#7FC9B4, Accent #E08A18/#F5B14A, Success #067A58/#35D6A4, Danger #B3372C/#FF7A6B, Text primary #10201C/#F2F7F5, Text muted #5B6B66/#93A5A0, Separator #DDE4E1/#2B3835), checked by resolving each Color in both light and dark trait environments.",
+      "A test greps App/Sources/Views for hex literals and colour initialisers taking raw RGB and finds zero matches \u2014 view code uses Palette only.",
+      "Typography exposes the six roles at the sizes and weights in ART.md (Display 56 bold, Title 30 semibold, Amount 22 medium, Key 26 medium, Body 17 regular, Caption 13 medium) with SF Rounded on the first four and the default face on the last two, and every money role reports monospacedDigit enabled.",
+      "The grand total label is configured with lineLimit 1 and minimumScaleFactor 0.6.",
+      "Layout constants expose only the spacing values 4, 8, 12, 16, 24, 32, 48 and a screen margin of 20; a test asserting the spacing set equals exactly that list passes.",
+      "Corner radii constants are keypad key 16, card 20, sheet 28, history row 14, all with continuous style, and the preset pill radius is 999.",
+      "ReceiptEdge produces a path whose notches are 10 pt wide and 6 pt deep and which spans the full given width with a whole number of notches.",
+      "The keypad is a 4x3 grid with 12 pt gutters and every key has a minimum height of 56 and a minimum tap target of 44x44.",
+      "A UI test launching in light and again in dark captures the main screen with no clipped or truncated total at Dynamic Type sizes .large and .accessibilityLarge on an iPhone SE-sized device."
+    ],
+    "test_file": "Tests/DesignSystemTests.swift",
+    "status": "pending",
+    "commit": ""
+  },
+  {
+    "identifier": "TIP-5",
+    "title": "Sticky settings, saved history and share text",
+    "criteria": [
+      "A settings store round-trips tip percent, split count and round mode: writing 18, 4 and .up then reading from a fresh store instance backed by the same defaults returns 18, 4 and .up.",
+      "A fresh model built from a store that has never been written uses tip 20, split 1 and round mode .off.",
+      "A model restored from a store with saved settings has billCents 0 \u2014 the bill never persists.",
+      "Saving a calculation writes one entry holding bill cents, tip percent, tip cents, total cents, split count and a timestamp, and reading history returns it.",
+      "History is newest-first: saving three entries in order returns them in reverse order of timestamp.",
+      "Saving a 101st entry leaves exactly 100 entries and the oldest one is gone.",
+      "Deleting an entry by id removes only that entry and leaves the rest in order.",
+      "Clear-all empties the store, and the clear-all action is only performed after the confirmation callback returns true \u2014 invoking the view model's clearAll without confirmation leaves history intact.",
+      "Applying a history entry to the model restores its bill cents, tip percent, split count and round mode, and the recomputed grand total equals the stored total.",
+      "shareText for bill 4999, tip 20%, split 2 returns exactly \"Bill $49.99 + 20% tip $10.00 = $59.99 \u2014 $30.00 each (2 people)\"; with split 1 it ends \"(1 person)\".",
+      "A UI test saves a calculation, relaunches the app, opens history and finds a row showing the same bill, tip, total and split."
+    ],
+    "test_file": "Tests/PersistenceTests.swift",
+    "status": "pending",
+    "commit": ""
+  },
+  {
+    "identifier": "TIP-6",
+    "title": "Motion and haptics",
+    "criteria": [
+      "Motion exposes named animations matching ART.md: amount change 0.2s snappy, key press down 0.09s easeOut, key release spring response 0.14 damping 0.8, preset select 0.18s snappy, split change 0.16s snappy, round mode 0.18s snappy, remainder appear 0.2s snappy, save confirm spring response 0.26 damping 0.7.",
+      "A test asserting every duration exposed by Motion is at most 0.4 seconds passes.",
+      "Motion.resolve(_:reduceMotion: true) returns a crossfade-equivalent animation for every named animation, and resolve(_:reduceMotion: false) returns the full animation \u2014 asserted for all eight names.",
+      "A test greps App/Sources/Views and finds no bare .animation(_) call without a value: argument \u2014 every animation is value-driven.",
+      "Money labels apply contentTransition(.numericText()) \u2014 asserted on the grand total, per-person and tip labels via their view configuration.",
+      "The haptic feedback map returns light impact for a keypad digit, selection for a preset change, selection for a split change, and success for a save.",
+      "A UI test taps 4, 9, 9, 9 and reads the grand total as \"$59.99\" within 1 second of the last tap, proving no loading state or delay was introduced."
+    ],
+    "test_file": "Tests/MotionTests.swift",
+    "status": "pending",
+    "commit": ""
+  },
+  {
+    "identifier": "TIP-7",
+    "title": "Accessibility labels, identifiers and the full-flow UI test",
+    "criteria": [
+      "Every keypad key has accessibility identifier \"key.<digit>\" for 0 through 9 and \"key.delete\", and the delete key's label reads \"Delete last digit\".",
+      "Each tip preset has identifier \"preset.<percent>\" and a label that reads its meaning and state, e.g. \"20 percent tip, selected\" when active and \"15 percent tip\" when not.",
+      "The split stepper buttons have identifiers \"split.minus\" and \"split.plus\", the count has identifier \"split.count\" with a label like \"Split 2 ways\", and at split 1 the minus button reports itself as disabled to VoiceOver.",
+      "The round mode control has identifier \"round.mode\" and its three options read \"Rounding off\", \"Round total up\" and \"Round total down\".",
+      "The grand total, bill, tip and per-person labels have identifiers \"total.grand\", \"total.bill\", \"total.tip\" and \"total.perPerson\", each with a label naming what it is plus its formatted value.",
+      "The grand total label is marked as an accessibility live region so a change is announced.",
+      "The save, share and history buttons have identifiers \"action.save\", \"action.share\" and \"action.history\" with labels \"Save calculation\", \"Share calculation\" and \"Show history\".",
+      "A UI test plays a full session on a fresh install: launch, tap 4 9 9 9, read total.bill as \"$49.99\", tap preset.20, read total.grand as \"$59.99\", tap split.plus once, read total.perPerson as \"$30.00\", switch round.mode to up, read total.grand as \"$60.00\", tap action.save, open action.history and find the saved row \u2014 all assertions pass with no system keyboard ever appearing."
+    ],
+    "test_file": "UITests/FullFlowUITests.swift",
+    "status": "pending",
+    "commit": ""
+  }
+]

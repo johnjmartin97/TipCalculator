@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Dark appearance variant: opaque Background plate, dark palette on top. -->
+  <defs>
+    <radialGradient id="darkPlate" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0" stop-color="#22302C"/>
+      <stop offset="1" stop-color="#0B1311"/>
+    </radialGradient>
+  </defs>
+  <rect x="0" y="0" width="1024" height="1024" fill="#0B1311"/>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#darkPlate)"/>
+  <g transform="rotate(8 512 512)">
+    <path fill="#18221F" stroke="#35D6A4" stroke-width="10" d="M 300 160
+      H 724 A 28 28 0 0 1 752 188
+      V 812
+      L 732 848 L 712 812 L 692 848 L 672 812 L 652 848 L 632 812
+      L 612 848 L 592 812 L 572 848 L 552 812 L 532 848 L 512 812
+      L 492 848 L 472 812 L 452 848 L 432 812 L 412 848 L 392 812
+      L 372 848 L 352 812 L 332 848 L 312 812 L 292 848 L 272 812
+      V 188 A 28 28 0 0 1 300 160 Z"/>
+
+    <path stroke="#2B3835" stroke-width="10" stroke-linecap="round"
+          d="M 328 250 H 696 M 328 742 H 696"/>
+
+    <g stroke="#F5B14A" stroke-width="40" fill="none" stroke-linecap="round">
+      <path d="M 384 652 L 640 372"/>
+      <circle cx="398" cy="390" r="58"/>
+      <circle cx="626" cy="634" r="58"/>
+    </g>
+  </g>
+</svg>

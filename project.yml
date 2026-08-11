@@ -20,12 +20,16 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: App/Sources
     resources:
       - path: Resources
+        optional: true
+      - path: App/Assets.xcassets
         optional: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.powerplant.tipcalculator
+        INFOPLIST_KEY_UILaunchScreen_BackgroundColor: LaunchBackground
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
